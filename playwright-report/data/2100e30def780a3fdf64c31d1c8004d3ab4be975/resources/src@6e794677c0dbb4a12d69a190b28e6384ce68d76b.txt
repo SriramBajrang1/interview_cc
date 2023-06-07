@@ -1,0 +1,46 @@
+const { expect } = require('@playwright/test');
+
+exports.CheckersPage = class CheckersPage {
+    /**
+     * @param {import('@playwright/test').Page} page
+     */
+    constructor(page) {
+        this.page = page;
+        this.makeMoveLocator = page.getByRole('heading', {name: 'Checkers'})
+    }
+
+    async moveToSpace(checkersSpace, selectedMoveSpace) {
+        // click our chcker space to select the piece we are about to move
+        await this.page.locator(`xpath=//img[@name='space${checkersSpace}']`).click();
+        // click on the space to move our checker to
+        await this.page.locator(`xpath=//img[@name='space${selectedMoveSpace}']`).click();
+    };
+
+    async doubleJump(checkersSpace, selectedMoveSpace, doubleJumpSpace) {
+        // click our chcker space to select the piece we are about to move
+        await this.page.locator(`xpath=//img[@name='space${checkersSpace}']`).click();
+        // click on the space to move our checker to
+        await this.page.locator(`xpath=//img[@name='space${selectedMoveSpace}']`).click();
+        // click on double jump space to jump a second blue piece
+        await this.page.locator(`xpath=//img[@name='space${doubleJumpSpace}']`).click();
+    }; 
+
+    async confirmNextMoveCanBeMade() {
+        await console.log("Verifying Make a move text is present");
+        // verify the Make a move text is present
+        let makeAMoveLocator = this.page.locator("id=message");
+        await expect(makeAMoveLocator).toBeVisible();
+    }
+
+    async clickRestartButton() {
+        // click on the restart button
+        await this.page.getByText('Restart...').click();
+    }
+
+    async verifyRestart() {
+        this.checkersSpace = "62"
+        let src = await this.page.locator("xpath=//img[@name='space62']").getAttribute("src");
+        // verify the game restarted by making sure the first checker we touch is in the starting space
+        await expect(src).toEqual("you1.gif")
+    }
+};
